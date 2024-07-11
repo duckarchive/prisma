@@ -1,0 +1,19 @@
+{
+  "name": "duck-inspector-schema",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate": "npx prisma generate",
+    "postinstall": "npm run generate"
+  },
+  "author": "alexandrtovmach@gmail.com",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@prisma/client": "^5.16.2",
+    "prisma": "^5.16.2"
+  },
+  "peerDependencies": {
+    "@prisma/client": ">=5"
+  }
+}
