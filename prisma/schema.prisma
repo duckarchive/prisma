@@ -18,6 +18,7 @@ enum ResourceType {
   ARCHIUM
   FAMILY_SEARCH
   WIKIPEDIA
+  BABYN_YAR
 }
 
 model Archive {
