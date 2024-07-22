@@ -37,6 +37,7 @@ model Archive {
   matches      Match[]
   fetches      Fetch[]
 
+  @@index([code])
   @@map("archives")
 }
 
@@ -54,6 +55,7 @@ model Fund {
   fetches      Fetch[]
 
   @@unique([code, archive_id])
+  @@index([code])
   @@map("funds")
 }
 
@@ -71,6 +73,7 @@ model Description {
   fetches    Fetch[]
 
   @@unique([code, fund_id])
+  @@index([code])
   @@map("descriptions")
 }
 
@@ -87,6 +90,7 @@ model Case {
   fetches        Fetch[]
 
   @@unique([code, description_id])
+  @@index([code])
   @@map("cases")
 }
 
