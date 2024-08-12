@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -119,8 +119,6 @@ model Match {
   resource       Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   url            String?       @db.VarChar(255)
   api_url        String        @db.VarChar(255)
-  api_method     String?       @db.VarChar(10)
-  api_headers    String?       @db.VarChar(255)
   api_params     String?       @db.VarChar(255)
   archive_id     String?       @db.Uuid
   archive        Archive?      @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -130,19 +128,20 @@ model Match {
   description    Description?  @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   case_id        String?       @db.Uuid
   case           Case?         @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  last_count     Int?
   children_count Int?
+  full_code      String?
   results        MatchResult[]
 
   @@unique([resource_id, archive_id, fund_id, description_id, case_id])
+  @@index([full_code])
+  @@index([full_code(ops: raw("gin_trgm_ops"))], type: Gin, name: "full_code_gin_trgm_ops_idx")
   @@map("matches")
 }
 
 model MatchResult {
-  created_at DateTime  @default(now()) @db.Timestamp(6)
-  updated_at DateTime? @updatedAt @db.Timestamp(6)
-  match_id   String    @db.Uuid
-  match      Match     @relation(fields: [match_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  match_id   String   @db.Uuid
+  match      Match    @relation(fields: [match_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   count      Int
   error      String?
 
@@ -157,8 +156,6 @@ model Fetch {
   resource_id    String        @db.Uuid
   resource       Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   api_url        String        @db.VarChar(255)
-  api_method     String?       @db.VarChar(10)
-  api_headers    String?       @db.VarChar(255)
   api_params     String?       @db.VarChar(255)
   archive_id     String?       @db.Uuid
   archive        Archive?      @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -168,7 +165,6 @@ model Fetch {
   description    Description?  @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   case_id        String?       @db.Uuid
   case           Case?         @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  last_count     Int?
   children_count Int?
   results        FetchResult[]
 
@@ -177,10 +173,9 @@ model Fetch {
 }
 
 model FetchResult {
-  created_at DateTime  @default(now()) @db.Timestamp(6)
-  updated_at DateTime? @updatedAt @db.Timestamp(6)
-  fetch_id   String    @db.Uuid
-  fetch      Fetch?    @relation(fields: [fetch_id], references: [id])
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  fetch_id   String   @db.Uuid
+  fetch      Fetch?   @relation(fields: [fetch_id], references: [id])
   count      Int
   error      String?
 
