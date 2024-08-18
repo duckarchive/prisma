@@ -132,7 +132,7 @@ model Match {
   full_code      String?
   results        MatchResult[]
 
-  @@unique([resource_id, archive_id, fund_id, description_id, case_id])
+  @@unique([resource_id, archive_id, fund_id, description_id, case_id, api_params])
   @@index([full_code])
   @@index([full_code(ops: raw("gin_trgm_ops"))], type: Gin, name: "full_code_gin_trgm_ops_idx")
   @@map("matches")
@@ -168,7 +168,7 @@ model Fetch {
   children_count Int?
   results        FetchResult[]
 
-  @@unique([resource_id, archive_id, fund_id, description_id, case_id])
+  @@unique([resource_id, archive_id, fund_id, description_id, case_id, api_params])
   @@map("fetches")
 }
 

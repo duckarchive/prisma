@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "generate": "npx prisma generate",
+    "new": "npx prisma migrate dev",
     "postinstall": "npm run generate"
   },
   "author": "alexandrtovmach@gmail.com",
