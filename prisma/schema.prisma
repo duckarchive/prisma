@@ -45,7 +45,7 @@ model Archive {
 
 model Fund {
   id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code         String        @db.VarChar(10)
+  code         String        @db.VarChar(20)
   created_at   DateTime      @default(now()) @db.Timestamp(6)
   updated_at   DateTime?     @updatedAt @db.Timestamp(6)
   title        String?       @db.VarChar(255)
@@ -63,7 +63,7 @@ model Fund {
 
 model Description {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code       String    @db.VarChar(10)
+  code       String    @db.VarChar(20)
   created_at DateTime  @default(now()) @db.Timestamp(6)
   updated_at DateTime? @updatedAt @db.Timestamp(6)
   title      String?   @db.VarChar(255)
@@ -119,8 +119,8 @@ model Match {
   updated_at     DateTime?     @updatedAt @db.Timestamp(6)
   resource_id    String        @db.Uuid
   resource       Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  url            String?       @db.VarChar(255)
-  api_url        String        @db.VarChar(255)
+  url            String?       @db.Text
+  api_url        String        @db.Text
   api_params     String?       @db.VarChar(255)
   archive_id     String?       @db.Uuid
   archive        Archive?      @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
