@@ -114,25 +114,26 @@ model Resource {
 }
 
 model Match {
-  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at     DateTime      @default(now()) @db.Timestamp(6)
-  updated_at     DateTime?     @updatedAt @db.Timestamp(6)
-  resource_id    String        @db.Uuid
-  resource       Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  url            String?       @db.Text
-  api_url        String        @db.Text
-  api_params     String?       @db.VarChar(255)
-  archive_id     String?       @db.Uuid
-  archive        Archive?      @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  fund_id        String?       @db.Uuid
-  fund           Fund?         @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  description_id String?       @db.Uuid
-  description    Description?  @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  case_id        String?       @db.Uuid
-  case           Case?         @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at     DateTime       @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?      @updatedAt @db.Timestamp(6)
+  resource_id    String         @db.Uuid
+  resource       Resource       @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  url            String?        @db.Text
+  api_url        String         @db.Text
+  api_params     String?        @db.VarChar(255)
+  archive_id     String?        @db.Uuid
+  archive        Archive?       @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fund_id        String?        @db.Uuid
+  fund           Fund?          @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  description_id String?        @db.Uuid
+  description    Description?   @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  case_id        String?        @db.Uuid
+  case           Case?          @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   children_count Int?
   full_code      String?
   results        MatchResult[]
+  user_downloads UserDownload[]
 
   @@unique([resource_id, archive_id, fund_id, description_id, case_id, api_params])
   @@index([full_code])
@@ -183,4 +184,26 @@ model FetchResult {
 
   @@id([fetch_id, created_at])
   @@map("fetch_results")
+}
+
+model User {
+  id             String         @unique @db.VarChar(255)
+  created_at     DateTime       @default(now()) @db.Timestamp(6)
+  email          String         @id @db.VarChar(255)
+  is_banned      Boolean        @default(false)
+  user_downloads UserDownload[]
+
+  @@map("users")
+}
+
+model UserDownload {
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  count      Int
+  match_id   String?  @db.Uuid
+  match      Match?   @relation(fields: [match_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_id    String   @db.VarChar(255)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, created_at])
+  @@map("user_downloads")
 }
