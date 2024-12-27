@@ -221,12 +221,13 @@ model FamilySearchPlace {
 }
 
 model FamilySearchProject {
-  id             String    @id
-  created_at     DateTime  @default(now()) @db.Timestamp(6)
-  updated_at     DateTime? @updatedAt @db.Timestamp(6)
-  archive_id     String    @db.Uuid
-  archive        Archive   @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  children_count Int?
+  id                  String    @id
+  created_at          DateTime  @default(now()) @db.Timestamp(6)
+  updated_at          DateTime? @updatedAt @db.Timestamp(6)
+  archive_id          String?   @db.Uuid
+  archive             Archive?  @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children_count      Int?
+  prev_children_count Int?
 
   @@map("family_search_projects")
 }
