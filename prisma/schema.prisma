@@ -39,6 +39,7 @@ model Archive {
   matches                Match[]
   fetches                Fetch[]
   family_search_projects FamilySearchProject[]
+  daily_stats            DailyStat[]
 
   @@index([code])
   @@map("archives")
@@ -143,21 +144,21 @@ model Match {
 }
 
 model Fetch {
-  id                  String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at          DateTime      @default(now()) @db.Timestamp(6)
-  updated_at          DateTime?     @updatedAt @db.Timestamp(6)
-  resource_id         String        @db.Uuid
-  resource            Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  api_url             String        @db.VarChar(255)
-  api_params          String?       @db.VarChar(255)
-  archive_id          String?       @db.Uuid
-  archive             Archive?      @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  fund_id             String?       @db.Uuid
-  fund                Fund?         @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  description_id      String?       @db.Uuid
-  description         Description?  @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  case_id             String?       @db.Uuid
-  case                Case?         @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at          DateTime     @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?    @updatedAt @db.Timestamp(6)
+  resource_id         String       @db.Uuid
+  resource            Resource     @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  api_url             String       @db.VarChar(255)
+  api_params          String?      @db.VarChar(255)
+  archive_id          String?      @db.Uuid
+  archive             Archive?     @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fund_id             String?      @db.Uuid
+  fund                Fund?        @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  description_id      String?      @db.Uuid
+  description         Description? @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  case_id             String?      @db.Uuid
+  case                Case?        @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   children_count      Int?
   prev_children_count Int?
 
@@ -208,4 +209,18 @@ model FamilySearchProject {
   prev_children_count Int?
 
   @@map("family_search_projects")
+}
+
+model DailyStat {
+  created_at DateTime @default(now()) @db.Timestamp(4)
+  archive_id String   @db.Uuid
+  archive    Archive  @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  family_search_count Int @default(0)
+  archium_count       Int @default(0)
+  babyn_yar_count     Int @default(0)
+  wikipedia_count     Int @default(0)
+  website_count       Int @default(0)
+
+  @@id([archive_id, created_at])
+  @@map("daily_stats")
 }
