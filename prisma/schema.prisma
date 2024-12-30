@@ -215,11 +215,11 @@ model DailyStat {
   created_at DateTime @default(now()) @db.Timestamp(4)
   archive_id String   @db.Uuid
   archive    Archive  @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  family_search_count Int @default(0)
-  archium_count       Int @default(0)
-  babyn_yar_count     Int @default(0)
-  wikipedia_count     Int @default(0)
-  website_count       Int @default(0)
+  family_search_count Int @default(0) @db.Integer
+  archium_count       Int @default(0) @db.Integer
+  babyn_yar_count     Int @default(0) @db.Integer
+  wikipedia_count     Int @default(0) @db.Integer
+  website_count       Int @default(0) @db.Integer
 
   @@id([archive_id, created_at])
   @@map("daily_stats")
