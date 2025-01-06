@@ -116,26 +116,25 @@ model Resource {
 }
 
 model Match {
-  id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at          DateTime       @default(now()) @db.Timestamp(6)
-  updated_at          DateTime?      @updatedAt @db.Timestamp(6)
-  resource_id         String         @db.Uuid
-  resource            Resource       @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  url                 String?        @db.Text
-  api_url             String         @db.Text
-  api_params          String?        @db.VarChar(255)
-  archive_id          String?        @db.Uuid
-  archive             Archive?       @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  fund_id             String?        @db.Uuid
-  fund                Fund?          @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  description_id      String?        @db.Uuid
-  description         Description?   @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  case_id             String?        @db.Uuid
-  case                Case?          @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at          DateTime     @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?    @updatedAt @db.Timestamp(6)
+  resource_id         String       @db.Uuid
+  resource            Resource     @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  url                 String?      @db.Text
+  api_url             String       @db.Text
+  api_params          String?      @db.VarChar(255)
+  archive_id          String?      @db.Uuid
+  archive             Archive?     @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fund_id             String?      @db.Uuid
+  fund                Fund?        @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  description_id      String?      @db.Uuid
+  description         Description? @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  case_id             String?      @db.Uuid
+  case                Case?        @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   prev_children_count Int?
   children_count      Int?
   full_code           String?
-  user_downloads      UserDownload[]
 
   @@unique([resource_id, archive_id, fund_id, description_id, case_id, api_params])
   @@index([full_code])
@@ -180,8 +179,8 @@ model User {
 model UserDownload {
   created_at DateTime @default(now()) @db.Timestamp(6)
   count      Int
-  match_id   String?  @db.Uuid
-  match      Match?   @relation(fields: [match_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  code       String?  @db.VarChar(50)
+  base_url   String?  @db.VarChar(255)
   user_id    String   @db.VarChar(255)
   user       User     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -212,14 +211,14 @@ model FamilySearchProject {
 }
 
 model DailyStat {
-  created_at DateTime @default(now()) @db.Timestamp(4)
-  archive_id String   @db.Uuid
-  archive    Archive  @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  family_search_count Int @default(0) @db.Integer
-  archium_count       Int @default(0) @db.Integer
-  babyn_yar_count     Int @default(0) @db.Integer
-  wikipedia_count     Int @default(0) @db.Integer
-  website_count       Int @default(0) @db.Integer
+  created_at          DateTime @default(now()) @db.Timestamp(4)
+  archive_id          String   @db.Uuid
+  archive             Archive  @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  family_search_count Int      @default(0) @db.Integer
+  archium_count       Int      @default(0) @db.Integer
+  babyn_yar_count     Int      @default(0) @db.Integer
+  wikipedia_count     Int      @default(0) @db.Integer
+  website_count       Int      @default(0) @db.Integer
 
   @@id([archive_id, created_at])
   @@map("daily_stats")
