@@ -181,6 +181,7 @@ model UserDownload {
   count      Int
   code       String?  @db.VarChar(50)
   base_url   String?  @db.VarChar(255)
+  country    String?  @db.VarChar(100)
   user_id    String   @db.VarChar(255)
   user       User     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
