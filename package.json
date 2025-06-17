@@ -10,8 +10,7 @@
     "generate": "npm run generate:inspector && npm run generate:catalog && npm run generate:duckkey",
     "new:inspector": "prisma migrate dev --schema=./prisma/inspector/schema.prisma",
     "new:catalog": "prisma migrate dev --schema=./prisma/catalog/schema.prisma",
-    "new:duckkey": "prisma migrate dev --schema=./prisma/duckkey/schema.prisma",
-    "postinstall": "npm run generate"
+    "new:duckkey": "prisma migrate dev --schema=./prisma/duckkey/schema.prisma"
   },
   "author": {
     "name": "Alexandr Tovmach",
