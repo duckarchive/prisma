@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+}
+
+model User {
+  id             String         @unique @db.VarChar(255)
+  created_at     DateTime       @default(now()) @db.Timestamp(6)
+  email          String         @id @db.VarChar(255)
+  is_banned      Boolean        @default(false)
+  is_premium     Boolean        @default(false)
+  is_admin       Boolean        @default(false)
+  user_downloads UserDownload[]
+  lookups        Lookup[]
+  branches       Branch[]
+  locations      Location[]
+
+  @@map("users")
+}
+
+model UserDownload {
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  count      Int
+  code       String?  @db.VarChar(50)
+  base_url   String?  @db.VarChar(255)
+  country    String?  @db.VarChar(100)
+  user_id    String   @db.VarChar(255)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, created_at])
+  @@map("user_downloads")
+}
+
+model Lookup {
+  user_id          String    @db.VarChar(255)
+  user             User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  full_code        String    @db.VarChar(255)
+  note             String?
+  is_online        Boolean   @default(false)
+  is_sync_disabled Boolean   @default(false)
+  location_id      String    @db.VarChar(255)
+  location         Location? @relation(fields: [location_id], references: [id])
+  branch_id        String    @db.VarChar(255)
+  branch           Branch?   @relation(fields: [branch_id], references: [id])
+  year             Int
+
+  @@id([user_id, full_code, location_id, branch_id, year])
+  @@map("lookups")
+}
+
+model Location {
+  id        String   @id @db.VarChar(255)
+  user_id   String   @db.VarChar(255)
+  user      User     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  name      String   @db.VarChar(255)
+  latitude  Float?
+  longitude Float?
+  lookups   Lookup[]
+
+  @@map("locations")
+}
+
+model Branch {
+  id      String   @id @db.VarChar(255)
+  user_id String   @db.VarChar(255)
+  user    User     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  name    String   @db.VarChar(255)
+  lookups Lookup[]
+
+  @@map("branches")
+}
