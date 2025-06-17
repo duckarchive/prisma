@@ -1,20 +1,30 @@
 {
-  "name": "duck-inspector-schema",
+  "name": "@duckarchive/prisma",
   "version": "1.14.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "generate": "npx prisma generate",
-    "new": "npx prisma migrate dev",
+    "generate:inspector": "prisma generate --schema=./prisma/inspector/schema.prisma",
+    "generate:catalog": "prisma generate --schema=./prisma/catalog/schema.prisma",
+    "generate:duckkey": "prisma generate --schema=./prisma/duckkey/schema.prisma",
+    "generate": "npm run generate:inspector && npm run generate:catalog && npm run generate:duckkey",
+    "new:inspector": "prisma migrate dev --schema=./prisma/inspector/schema.prisma",
+    "new:catalog": "prisma migrate dev --schema=./prisma/catalog/schema.prisma",
+    "new:duckkey": "prisma migrate dev --schema=./prisma/duckkey/schema.prisma",
     "postinstall": "npm run generate"
   },
-  "author": "alexandrtovmach@gmail.com",
+  "author": {
+    "name": "Alexandr Tovmach",
+    "email": "alexandrtovmach@gmail.com"
+  },
   "license": "UNLICENSED",
   "devDependencies": {
     "@prisma/client": "^5.18.0",
-    "prisma": "^5.18.0"
+    "prisma": "^5.18.0",
+    "prisma-zod-generator": "^0.8.13"
   },
   "peerDependencies": {
-    "@prisma/client": ">=5"
+    "@prisma/client": ">=5",
+    "prisma-zod-generator": "^0.8.13"
   }
 }
