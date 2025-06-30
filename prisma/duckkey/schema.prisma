@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
 }
 
 generator zod {
