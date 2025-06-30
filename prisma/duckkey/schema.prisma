@@ -1,10 +1,10 @@
-generator client {
-  provider = "prisma-client-js"
+generator zod {
+  provider = "prisma-zod-generator"
   output = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
 }
 
-generator zod {
-  provider = "prisma-zod-generator"
+generator client {
+  provider = "prisma-client-js"
   output = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
 }
 
