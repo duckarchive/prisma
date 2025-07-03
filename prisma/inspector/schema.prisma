@@ -21,6 +21,7 @@ enum ResourceType {
   WIKIPEDIA
   BABYN_YAR
   WEBSITE
+  GOOGLE_DRIVE
 }
 
 model Archive {
