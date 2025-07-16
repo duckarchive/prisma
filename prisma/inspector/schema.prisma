@@ -7,12 +7,12 @@
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
-  output = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
+  output        = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum ResourceType {
@@ -221,6 +221,7 @@ model DailyStat {
   archium_count       Int      @default(0) @db.Integer
   babyn_yar_count     Int      @default(0) @db.Integer
   wikipedia_count     Int      @default(0) @db.Integer
+  google_drive_count  Int      @default(0) @db.Integer
   website_count       Int      @default(0) @db.Integer
 
   @@id([archive_id, created_at])
