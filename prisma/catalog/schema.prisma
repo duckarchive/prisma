@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
+  output   = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
 }
 
 datasource db {
@@ -24,11 +24,10 @@ model Item {
   place                 String?
   lat                   Float?
   lng                   Float?
-  church_name           String?
-  church_administration String?
-  confession            String?
   year                  Int
-  record_type           String
+  author                String?
+  author_administration String?
+  tags                  String[]
   archive_id            String    @db.Uuid
   archive               Archive   @relation(fields: [archive_id], references: [id])
   fund                  String?
