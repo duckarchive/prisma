@@ -25,6 +25,7 @@ model Item {
   place                 String?
   lat                   Float?
   lng                   Float?
+  radius_m              Int?
   year                  Int
   author                String?
   author_administration String?
