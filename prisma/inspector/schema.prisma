@@ -29,8 +29,8 @@ model Archive {
   code                   String                @db.VarChar(10)
   created_at             DateTime              @default(now()) @db.Timestamp(6)
   updated_at             DateTime?             @updatedAt @db.Timestamp(6)
-  title                  String?               @db.VarChar(255)
-  info                   String?               @db.VarChar(255)
+  title                  String?               @db.Text
+  info                   String?               @db.Text
   url                    String?               @db.VarChar(255)
   address                String?               @db.VarChar(255)
   phone_number           String?               @db.VarChar(20)
@@ -51,8 +51,10 @@ model Fund {
   code         String        @db.VarChar(20)
   created_at   DateTime      @default(now()) @db.Timestamp(6)
   updated_at   DateTime?     @updatedAt @db.Timestamp(6)
-  title        String?       @db.VarChar(255)
-  info         String?       @db.VarChar(255)
+  title        String?       @db.Text
+  info         String?       @db.Text
+  start_year   Int           @default(0)
+  end_year     Int?
   archive_id   String        @db.Uuid
   archive      Archive       @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   descriptions Description[]
@@ -65,17 +67,20 @@ model Fund {
 }
 
 model Description {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code       String    @db.VarChar(20)
-  created_at DateTime  @default(now()) @db.Timestamp(6)
-  updated_at DateTime? @updatedAt @db.Timestamp(6)
-  title      String?   @db.VarChar(255)
-  info       String?   @db.VarChar(255)
-  fund_id    String    @db.Uuid
-  fund       Fund      @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  cases      Case[]
-  matches    Match[]
-  fetches    Fetch[]
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code             String    @db.VarChar(20)
+  created_at       DateTime  @default(now()) @db.Timestamp(6)
+  updated_at       DateTime? @updatedAt @db.Timestamp(6)
+  title            String?   @db.Text
+  info             String?   @db.Text
+  start_year       Int       @default(0)
+  end_year         Int?
+  public_copy_urls String[]
+  fund_id          String    @db.Uuid
+  fund             Fund      @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cases            Case[]
+  matches          Match[]
+  fetches          Fetch[]
 
   @@unique([code, fund_id])
   @@index([code])
@@ -83,16 +88,27 @@ model Description {
 }
 
 model Case {
-  id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code           String      @db.VarChar(20)
-  created_at     DateTime    @default(now()) @db.Timestamp(6)
-  updated_at     DateTime?   @updatedAt @db.Timestamp(6)
-  title          String?     @db.VarChar(255)
-  info           String?     @db.VarChar(255)
-  description_id String      @db.Uuid
-  description    Description @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  matches        Match[]
-  fetches        Fetch[]
+  id                    String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                  String      @db.VarChar(20)
+  full_code             String      @default("")
+  created_at            DateTime    @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?   @updatedAt @db.Timestamp(6)
+  title                 String?     @db.Text
+  info                  String?     @db.Text
+  place                 String?
+  lat                   Float?
+  lng                   Float?
+  radius_m              Int?
+  start_year            Int         @default(0)
+  end_year              Int?
+  author                String?
+  author_administration String?
+  tags                  String[]
+  public_copy_urls      String[]
+  description_id        String      @db.Uuid
+  description           Description @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  matches               Match[]
+  fetches               Fetch[]
 
   @@unique([code, description_id])
   @@index([code])
@@ -105,8 +121,8 @@ model Resource {
   created_at DateTime      @default(now()) @db.Timestamp(6)
   updated_at DateTime?     @updatedAt @db.Timestamp(6)
   code       String        @db.VarChar(50)
-  title      String?       @db.VarChar(255)
-  info       String?       @db.VarChar(255)
+  title      String?       @db.Text
+  info       String?       @db.Text
   url        String?       @db.VarChar(255)
   logo_url   String?       @db.VarChar(255)
   type       ResourceType?
