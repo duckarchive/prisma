@@ -75,7 +75,6 @@ model Description {
   info             String?   @db.Text
   start_year       Int       @default(0)
   end_year         Int?
-  public_copy_urls String[]
   fund_id          String    @db.Uuid
   fund             Fund      @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   cases            Case[]
@@ -104,7 +103,6 @@ model Case {
   author                String?
   author_administration String?
   tags                  String[]
-  public_copy_urls      String[]
   description_id        String      @db.Uuid
   description           Description @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   matches               Match[]
