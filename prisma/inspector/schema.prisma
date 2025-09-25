@@ -114,9 +114,9 @@ model Case {
 
 model Locations {
   id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  lat      Float?
-  lng      Float?
-  radius_m Int?
+  lat      Float
+  lng      Float
+  radius_m Int    @default(0)
   case_id  String @db.Uuid
   case     Case   @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
