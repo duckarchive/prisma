@@ -54,60 +54,79 @@ model Fund {
   updated_at     DateTime?     @updatedAt @db.Timestamp(6)
   title          String?       @db.Text
   info           String?       @db.Text
-  start_year     Int           @default(0)
-  end_year       Int?
   children_count Int?          @default(0)
   archive_id     String        @db.Uuid
   archive        Archive       @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   descriptions   Description[]
   matches        Match[]
   fetches        Fetch[]
+  years          FundYears[]
 
   @@unique([code, archive_id])
   @@index([code])
   @@map("funds")
 }
 
+model FundYears {
+  fund_id    String @db.Uuid
+  fund       Fund   @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  start_year Int
+  end_year   Int
+
+  @@id([fund_id, start_year, end_year])
+  @@index([start_year, end_year])
+  @@map("fund_years")
+}
+
 model Description {
-  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code           String    @db.VarChar(20)
-  created_at     DateTime  @default(now()) @db.Timestamp(6)
-  updated_at     DateTime? @updatedAt @db.Timestamp(6)
-  title          String?   @db.Text
-  info           String?   @db.Text
-  start_year     Int       @default(0)
-  end_year       Int?
-  children_count Int?      @default(0)
-  fund_id        String    @db.Uuid
-  fund           Fund      @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id             String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code           String             @db.VarChar(20)
+  created_at     DateTime           @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?          @updatedAt @db.Timestamp(6)
+  title          String?            @db.Text
+  info           String?            @db.Text
+  children_count Int?               @default(0)
+  fund_id        String             @db.Uuid
+  fund           Fund               @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   cases          Case[]
   matches        Match[]
   fetches        Fetch[]
+  years          DescriptionYears[]
 
   @@unique([code, fund_id])
   @@index([code])
   @@map("descriptions")
 }
 
+model DescriptionYears {
+  description_id String      @db.Uuid
+  description    Description @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  start_year     Int
+  end_year       Int
+
+  @@id([description_id, start_year, end_year])
+  @@index([start_year, end_year])
+  @@map("description_years")
+}
+
 model Case {
-  id                    String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code                  String      @db.VarChar(20)
-  full_code             String      @default("")
-  created_at            DateTime    @default(now()) @db.Timestamp(6)
-  updated_at            DateTime?   @updatedAt @db.Timestamp(6)
-  title                 String?     @db.Text
-  info                  String?     @db.Text
+  id                    String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                  String          @db.VarChar(20)
+  full_code             String          @default("")
+  created_at            DateTime        @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?       @updatedAt @db.Timestamp(6)
+  title                 String?         @db.Text
+  info                  String?         @db.Text
   place                 String?
-  start_year            Int         @default(0)
-  end_year              Int?
   author                String?
   author_administration String?
   tags                  String[]
-  description_id        String      @db.Uuid
-  description           Description @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  description_id        String          @db.Uuid
+  description           Description     @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   matches               Match[]
   fetches               Fetch[]
-  locations             Locations[]
+  locations             CaseLocations[]
+  years                 CaseYears[]
 
   @@unique([code, description_id])
   @@index([code])
@@ -115,7 +134,18 @@ model Case {
   @@map("cases")
 }
 
-model Locations {
+model CaseYears {
+  case_id    String @db.Uuid
+  case       Case   @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  start_year Int
+  end_year   Int
+
+  @@id([case_id, start_year, end_year])
+  @@index([start_year, end_year])
+  @@map("case_years")
+}
+
+model CaseLocations {
   id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   lat      Float
   lng      Float
@@ -123,7 +153,7 @@ model Locations {
   case_id  String @db.Uuid
   case     Case   @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@map("locations")
+  @@map("case_locations")
 }
 
 model Resource {
