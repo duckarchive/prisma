@@ -117,7 +117,6 @@ model Case {
   updated_at            DateTime?       @updatedAt @db.Timestamp(6)
   title                 String?         @db.Text
   info                  String?         @db.Text
-  place                 String?
   author                String?
   author_administration String?
   tags                  String[]
