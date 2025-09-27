@@ -79,15 +79,15 @@ model FundYear {
 }
 
 model Description {
-  id             String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code           String             @db.VarChar(20)
-  created_at     DateTime           @default(now()) @db.Timestamp(6)
-  updated_at     DateTime?          @updatedAt @db.Timestamp(6)
-  title          String?            @db.Text
-  info           String?            @db.Text
-  children_count Int?               @default(0)
-  fund_id        String             @db.Uuid
-  fund           Fund               @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code           String            @db.VarChar(20)
+  created_at     DateTime          @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?         @updatedAt @db.Timestamp(6)
+  title          String?           @db.Text
+  info           String?           @db.Text
+  children_count Int?              @default(0)
+  fund_id        String            @db.Uuid
+  fund           Fund              @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   cases          Case[]
   matches        Match[]
   fetches        Fetch[]
@@ -110,16 +110,16 @@ model DescriptionYear {
 }
 
 model Case {
-  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code           String          @db.VarChar(20)
-  full_code      String          @default("")
-  created_at     DateTime        @default(now()) @db.Timestamp(6)
-  updated_at     DateTime?       @updatedAt @db.Timestamp(6)
-  title          String?         @db.Text
-  info           String?         @db.Text
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code           String         @db.VarChar(20)
+  full_code      String         @default("")
+  created_at     DateTime       @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?      @updatedAt @db.Timestamp(6)
+  title          String?        @db.Text
+  info           String?        @db.Text
   tags           String[]
-  description_id String          @db.Uuid
-  description    Description     @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  description_id String         @db.Uuid
+  description    Description    @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   matches        Match[]
   fetches        Fetch[]
   locations      CaseLocation[]
@@ -154,16 +154,26 @@ model CaseLocation {
   @@map("case_locations")
 }
 
-model CaseAuthor {
-  id      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title   String
-  info    String?
-  lat     Float?
-  lng     Float?
-  tags    String[]
-  case_id String   @db.Uuid
-  case    Case     @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Author {
+  id    String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title String
+  info  String?
+  lat   Float?
+  lng   Float?
+  tags  String[]
+  cases CaseAuthor[]
 
+  @@map("authors")
+}
+
+model CaseAuthor {
+  case_id   String @db.Uuid
+  author_id String @db.Uuid
+
+  case   Case   @relation(fields: [case_id], references: [id])
+  author Author @relation(fields: [author_id], references: [id])
+
+  @@id([case_id, author_id])
   @@map("case_authors")
 }
 
