@@ -110,22 +110,21 @@ model DescriptionYears {
 }
 
 model Case {
-  id                    String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code                  String          @db.VarChar(20)
-  full_code             String          @default("")
-  created_at            DateTime        @default(now()) @db.Timestamp(6)
-  updated_at            DateTime?       @updatedAt @db.Timestamp(6)
-  title                 String?         @db.Text
-  info                  String?         @db.Text
-  author                String?
-  author_administration String?
-  tags                  String[]
-  description_id        String          @db.Uuid
-  description           Description     @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  matches               Match[]
-  fetches               Fetch[]
-  locations             CaseLocations[]
-  years                 CaseYears[]
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code           String          @db.VarChar(20)
+  full_code      String          @default("")
+  created_at     DateTime        @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?       @updatedAt @db.Timestamp(6)
+  title          String?         @db.Text
+  info           String?         @db.Text
+  tags           String[]
+  description_id String          @db.Uuid
+  description    Description     @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  matches        Match[]
+  fetches        Fetch[]
+  locations      CaseLocations[]
+  years          CaseYears[]
+  authors        CaseAuthors[]
 
   @@unique([code, description_id])
   @@index([code])
@@ -153,6 +152,19 @@ model CaseLocations {
   case     Case   @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("case_locations")
+}
+
+model CaseAuthors {
+  id      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title   String
+  info    String?
+  lat     Float?
+  lng     Float?
+  tags    String[]
+  case_id String   @db.Uuid
+  case    Case     @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("case_authors")
 }
 
 model Resource {
