@@ -151,6 +151,7 @@ model CaseLocation {
   case_id  String @db.Uuid
   case     Case   @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@unique([case_id, lat, lng, radius_m])
   @@map("case_locations")
 }
 
@@ -163,6 +164,7 @@ model Author {
   tags  String[]
   cases CaseAuthor[]
 
+  @@unique([title, lat, lng])
   @@map("authors")
 }
 
