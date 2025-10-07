@@ -293,18 +293,18 @@ model FamilySearchProject {
 }
 
 model FamilySearchItem {
-  id                String  @id @db.VarChar(50)
-  dgs               String  @db.VarChar(12)
-  archivalReference String? @db.VarChar(255)
-  volume            String? @db.VarChar(255)
-  volumes           String? @db.VarChar(255)
-  date              String? @db.VarChar(50)
-  imageCount        Int?    @db.Integer
-  projectId         String  @db.VarChar(50)
-  title             String? @db.Text
-  creator           String? @db.VarChar(255)
-  indexedChildCount Int?    @db.Integer
-  updated_at        DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  id                  String   @id @db.VarChar(50)
+  dgs                 String   @db.VarChar(12)
+  archival_reference  String?  @db.VarChar(255)
+  volume              String?  @db.VarChar(255)
+  volumes             String?  @db.VarChar(255)
+  date                String?  @db.VarChar(50)
+  image_count         Int?     @db.Integer
+  project_id          String   @db.VarChar(50)
+  title               String?  @db.Text
+  creator             String?  @db.VarChar(255)
+  indexed_child_count Int?     @db.Integer
+  updated_at          DateTime @default(now()) @updatedAt @db.Timestamp(6)
 
   @@map("family_search_items")
 }
