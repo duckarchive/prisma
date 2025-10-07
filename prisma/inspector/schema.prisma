@@ -302,7 +302,7 @@ model FamilySearchItem {
   image_count         Int?      @db.Integer
   project_id          String    @db.VarChar(50)
   title               String?   @db.Text
-  creator             String?   @db.VarChar(255)
+  creator             String?   @db.Text
   indexed_child_count Int?      @db.Integer
   updated_at          DateTime  @default(now()) @updatedAt @db.Timestamp(6)
   cataloged_at        DateTime? @db.Timestamp(6)
