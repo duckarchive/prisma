@@ -292,6 +292,23 @@ model FamilySearchProject {
   @@map("family_search_projects")
 }
 
+model FamilySearchItem {
+  id                String  @id @db.VarChar(50)
+  dgs               String  @db.VarChar(12)
+  archivalReference String? @db.VarChar(255)
+  volume            String? @db.VarChar(255)
+  volumes           String? @db.VarChar(255)
+  date              String? @db.VarChar(50)
+  imageCount        Int?    @db.Integer
+  projectId         String  @db.VarChar(50)
+  title             String? @db.Text
+  creator           String? @db.VarChar(255)
+  indexedChildCount Int?    @db.Integer
+  updated_at        DateTime @default(now()) @updatedAt @db.Timestamp(6)
+
+  @@map("family_search_items")
+}
+
 model DailyStat {
   created_at          DateTime @default(now()) @db.Timestamp(4)
   archive_id          String   @db.Uuid
