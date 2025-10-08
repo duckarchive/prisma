@@ -295,9 +295,9 @@ model FamilySearchProject {
 model FamilySearchItem {
   id                  String    @id @db.VarChar(50)
   dgs                 String    @db.VarChar(50)
-  archival_reference  String?   @db.VarChar(255)
-  volume              String?   @db.VarChar(255)
-  volumes             String?   @db.VarChar(255)
+  archival_reference  String?   @db.Text
+  volume              String?   @db.Text
+  volumes             String?   @db.Text
   date                String?   @db.VarChar(50)
   image_count         Int?      @db.Integer
   project_id          String    @db.VarChar(50)
