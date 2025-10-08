@@ -280,32 +280,30 @@ model FamilySearchPlace {
 }
 
 model FamilySearchProject {
-  id                  String    @id
-  created_at          DateTime  @default(now()) @db.Timestamp(6)
-  updated_at          DateTime? @updatedAt @db.Timestamp(6)
-  synced_at           DateTime? @db.Timestamp(6)
-  archive_id          String?   @db.Uuid
-  archive             Archive?  @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  children_count      Int?
-  prev_children_count Int?
+  id                  String             @id
+  synced_at           DateTime?          @db.Timestamp(6)
+  archive_id          String?            @db.Uuid
+  archive             Archive?           @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items               FamilySearchItem[]
 
   @@map("family_search_projects")
 }
 
 model FamilySearchItem {
-  id                  String    @id @db.VarChar(50)
-  dgs                 String    @db.VarChar(50)
-  archival_reference  String?   @db.Text
-  volume              String?   @db.Text
-  volumes             String?   @db.Text
-  date                String?   @db.VarChar(50)
-  image_count         Int?      @db.Integer
-  project_id          String    @db.VarChar(50)
-  title               String?   @db.Text
-  creator             String?   @db.Text
-  indexed_child_count Int?      @db.Integer
-  updated_at          DateTime  @default(now()) @updatedAt @db.Timestamp(6)
-  cataloged_at        DateTime? @db.Timestamp(6)
+  id                  String              @id @db.VarChar(50)
+  dgs                 String              @db.VarChar(50)
+  archival_reference  String?             @db.Text
+  volume              String?             @db.Text
+  volumes             String?             @db.Text
+  date                String?             @db.VarChar(50)
+  image_count         Int?                @db.Integer
+  project_id          String              @db.VarChar(50)
+  project             FamilySearchProject @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  title               String?             @db.Text
+  creator             String?             @db.Text
+  indexed_child_count Int?                @db.Integer
+  updated_at          DateTime            @default(now()) @updatedAt @db.Timestamp(6)
+  cataloged_at        DateTime?           @db.Timestamp(6)
 
   @@map("family_search_items")
 }
