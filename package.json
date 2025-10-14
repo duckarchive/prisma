@@ -5,12 +5,10 @@
   "main": "index.js",
   "scripts": {
     "generate:inspector": "prisma generate --schema=./prisma/inspector/schema.prisma",
-    "generate:catalog": "prisma generate --schema=./prisma/catalog/schema.prisma",
     "generate:duckkey": "prisma generate --schema=./prisma/duckkey/schema.prisma",
     "generate:duckarchive": "prisma generate --schema=./prisma/duckarchive/schema.prisma",
-    "generate": "npm run generate:inspector && npm run generate:catalog && npm run generate:duckkey && npm run generate:duckarchive",
+    "generate": "npm run generate:inspector && npm run generate:duckkey && npm run generate:duckarchive",
     "new:inspector": "prisma migrate dev --schema=./prisma/inspector/schema.prisma",
-    "new:catalog": "prisma migrate dev --schema=./prisma/catalog/schema.prisma",
     "new:duckkey": "prisma migrate dev --schema=./prisma/duckkey/schema.prisma",
     "new:duckarchive": "prisma migrate dev --schema=./prisma/duckarchive/schema.prisma"
   },
