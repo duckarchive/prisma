@@ -79,19 +79,20 @@ model FundYear {
 }
 
 model Description {
-  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code           String            @db.VarChar(20)
-  created_at     DateTime          @default(now()) @db.Timestamp(6)
-  updated_at     DateTime?         @updatedAt @db.Timestamp(6)
-  title          String?           @db.Text
-  info           String?           @db.Text
-  children_count Int?              @default(0)
-  fund_id        String            @db.Uuid
-  fund           Fund              @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id             String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code           String                  @db.VarChar(20)
+  created_at     DateTime                @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?               @updatedAt @db.Timestamp(6)
+  title          String?                 @db.Text
+  info           String?                 @db.Text
+  children_count Int?                    @default(0)
+  fund_id        String                  @db.Uuid
+  fund           Fund                    @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   cases          Case[]
   matches        Match[]
   fetches        Fetch[]
   years          DescriptionYear[]
+  online_copies  DescriptionOnlineCopy[]
 
   @@unique([code, fund_id])
   @@index([code])
@@ -109,22 +110,37 @@ model DescriptionYear {
   @@map("description_years")
 }
 
+model DescriptionOnlineCopy {
+  updated_at     DateTime    @default(now()) @updatedAt @db.Timestamp(6)
+  resource_id    String      @db.Uuid
+  resource       Resource    @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  description_id String      @db.Uuid
+  description    Description @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  api_url        String      @db.Text
+  api_params     String      @db.VarChar(255)
+  url            String?     @db.Text
+
+  @@id([resource_id, description_id, api_params])
+  @@map("description_online_copies")
+}
+
 model Case {
-  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code           String         @db.VarChar(20)
-  full_code      String         @default("")
-  created_at     DateTime       @default(now()) @db.Timestamp(6)
-  updated_at     DateTime?      @updatedAt @db.Timestamp(6)
-  title          String?        @db.Text
-  info           String?        @db.Text
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code           String           @db.VarChar(20)
+  full_code      String           @default("")
+  created_at     DateTime         @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?        @updatedAt @db.Timestamp(6)
+  title          String?          @db.Text
+  info           String?          @db.Text
   tags           String[]
-  description_id String         @db.Uuid
-  description    Description    @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  description_id String           @db.Uuid
+  description    Description      @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   matches        Match[]
   fetches        Fetch[]
   locations      CaseLocation[]
   years          CaseYear[]
   authors        CaseAuthor[]
+  online_copies  CaseOnlineCopy[]
 
   @@unique([code, description_id])
   @@index([code])
@@ -155,6 +171,20 @@ model CaseLocation {
   @@map("case_locations")
 }
 
+model CaseOnlineCopy {
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  resource_id String   @db.Uuid
+  resource    Resource @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  case_id     String   @db.Uuid
+  case        Case     @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  api_url     String   @db.Text
+  api_params  String   @db.VarChar(255)
+  url         String?  @db.Text
+
+  @@id([resource_id, case_id, api_params])
+  @@map("case_online_copies")
+}
+
 model Author {
   id    String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title String
@@ -180,17 +210,19 @@ model CaseAuthor {
 }
 
 model Resource {
-  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at DateTime      @default(now()) @db.Timestamp(6)
-  updated_at DateTime?     @updatedAt @db.Timestamp(6)
-  code       String        @db.VarChar(50)
-  title      String?       @db.Text
-  info       String?       @db.Text
-  url        String?       @db.VarChar(255)
-  logo_url   String?       @db.VarChar(255)
-  type       ResourceType?
-  matches    Match[]
-  fetches    Fetch[]
+  id                        String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at                DateTime                @default(now()) @db.Timestamp(6)
+  updated_at                DateTime?               @updatedAt @db.Timestamp(6)
+  code                      String                  @db.VarChar(50)
+  title                     String?                 @db.Text
+  info                      String?                 @db.Text
+  url                       String?                 @db.VarChar(255)
+  logo_url                  String?                 @db.VarChar(255)
+  type                      ResourceType?
+  matches                   Match[]
+  fetches                   Fetch[]
+  description_online_copies DescriptionOnlineCopy[]
+  case_online_copies        CaseOnlineCopy[]
 
   @@map("resources")
 }
