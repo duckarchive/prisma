@@ -172,14 +172,15 @@ model CaseLocation {
 }
 
 model CaseOnlineCopy {
-  updated_at  DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  resource_id String   @db.Uuid
-  resource    Resource @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  case_id     String   @db.Uuid
-  case        Case     @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  api_url     String   @db.Text
-  api_params  String   @db.VarChar(255)
-  url         String?  @db.Text
+  updated_at      DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  resource_id     String   @db.Uuid
+  resource        Resource @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  case_id         String   @db.Uuid
+  case            Case     @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  api_url         String   @db.Text
+  api_params      String   @db.VarChar(255)
+  api_params_temp Json?    @db.Json
+  url             String?  @db.Text
 
   @@id([resource_id, case_id, api_params])
   @@map("case_online_copies")
