@@ -7,12 +7,12 @@
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
-  output = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
+  output        = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -80,4 +80,20 @@ model Branch {
   lookups Lookup[]
 
   @@map("branches")
+}
+
+model DNAPrice {
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  my_heritage Int
+  ftdna       Int
+  ftdna_mtdna Int
+  ftdna_y111  Int
+  ftdna_y37   Int
+  ftdna_y700  Int
+  ancestry    Int
+  ancestry_uk Int
+  ancestry_de Int
+
+  @@id([created_at])
+  @@map("dna_prices")
 }
