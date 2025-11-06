@@ -83,8 +83,9 @@ model Branch {
 }
 
 model APIKey {
-  key        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  is_active  Boolean  @default(true)
+  key       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title     String? @db.VarChar(255)
+  is_active Boolean @default(true)
 
   @@map("api_keys")
 }

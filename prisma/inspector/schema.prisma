@@ -117,7 +117,7 @@ model DescriptionOnlineCopy {
   description_id String      @db.Uuid
   description    Description @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   api_url        String      @db.Text
-  api_params     String      @db.VarChar(255)
+  api_params     Json        @db.JsonB
   url            String?     @db.Text
 
   @@id([resource_id, description_id, api_params])
