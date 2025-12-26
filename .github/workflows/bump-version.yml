@@ -61,7 +61,7 @@ jobs:
           cache: "pnpm"
 
       - name: Update package.json in target
-        run: pnpm update @duckarchive/prisma@${{ needs.check-version.outputs.new_version }}
+        run: pnpm update @duckarchive/prisma
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
