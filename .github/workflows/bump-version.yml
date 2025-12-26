@@ -1,0 +1,61 @@
+name: Sync Version to Dependents
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "package.json"
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.get_version.outputs.VERSION }}
+      changed: ${{ steps.check_change.outputs.CHANGED }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if version changed
+        id: check_change
+        run: |
+          # Compare package.json version between current and previous commit
+          OLD_VER=$(git show HEAD~1:package.json | jq -r .version)
+          NEW_VER=$(jq -r .version package.json)
+          if [ "$OLD_VER" != "$NEW_VER" ]; then
+            echo "CHANGED=true" >> $GITHUB_OUTPUT
+            echo "VERSION=$NEW_VER" >> $GITHUB_OUTPUT
+          fi
+
+  create-prs:
+    needs: check-version
+    if: needs.check-version.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo:
+          [
+            "duckarchive/duckarchive.com",
+            "duckarchive/inspector.duckarchive.com",
+            "duckarchive/editor.duckarchive.com",
+          ]
+
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repo }}
+          token: ${{ secrets.GHA_AUTO_PR }}
+
+      - name: Update package.json in target
+        run: pnpm update @duckarchive/prisma@${{ needs.check-version.outputs.new_version }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GHA_AUTO_PR }}
+          commit-message: "chore: Update @duckarchive/prisma v${{ needs.check-version.outputs.new_version }}"
+          branch: "bump-prisma-version-${{ needs.check-version.outputs.new_version }}"
+          title: "Update @duckarchive/prisma to v${{ needs.check-version.outputs.new_version}}"
