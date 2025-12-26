@@ -61,7 +61,7 @@ jobs:
           cache: "pnpm"
 
       - name: Update package.json in target
-        run: pnpm update @duckarchive/prisma
+        run: pnpm update @duckarchive/prisma --ignore-workspace-root-check --ignore-scripts
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
@@ -70,3 +70,4 @@ jobs:
           commit-message: "chore: Update @duckarchive/prisma v${{ needs.check-version.outputs.new_version }}"
           branch: "bump-prisma-version-${{ needs.check-version.outputs.new_version }}"
           title: "Update @duckarchive/prisma to v${{ needs.check-version.outputs.new_version}}"
+          delete-branch: true
