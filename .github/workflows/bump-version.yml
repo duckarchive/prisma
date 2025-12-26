@@ -17,7 +17,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
+      - name: Extract and Compare Version
+        id: get_version
+        run: |
+          # 1. Get current version
+          NEW_VER=$(jq -r .version package.json)
 
+          # 2. Get previous version (handle errors if it's the first commit)
+          OLD_VER=$(git show HEAD~1:package.json | jq -r .version || echo "0.0.0")
+
+          echo "Old version: $OLD_VER"
+          echo "New version: $NEW_VER"
+
+          if [ "$OLD_VER" != "$NEW_VER" ]; then
+            echo "CHANGED=true" >> $GITHUB_OUTPUT
+            echo "VERSION=$NEW_VER" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGED=false" >> $GITHUB_OUTPUT
+          fi
       - name: Check if version changed
         id: check_change
         run: |
@@ -50,14 +67,12 @@ jobs:
           token: ${{ secrets.GHA_AUTO_PR }}
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8 # or your preferred version
+        uses: pnpm/action-setup@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: "pnpm"
 
       - name: Update package.json in target
