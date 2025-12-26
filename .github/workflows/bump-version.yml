@@ -61,7 +61,7 @@ jobs:
           cache: "pnpm"
 
       - name: Update package.json in target
-        run: pnpm update @duckarchive/prisma --ignore-workspace-root-check --ignore-scripts
+        run: pnpm update @duckarchive/prisma --ignore-workspace --ignore-scripts
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
