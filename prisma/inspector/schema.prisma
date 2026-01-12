@@ -5,14 +5,12 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
-  output        = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
+  provider = "prisma-client"
+  output   = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum ResourceType {
@@ -261,7 +259,7 @@ model Fetch {
   resource_id         String       @db.Uuid
   resource            Resource     @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   api_url             String       @db.VarChar(255)
-  api_params          String?      @db.VarChar(255)
+  api_params          Json         @db.JsonB
   archive_id          String?      @db.Uuid
   archive             Archive?     @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   fund_id             String?      @db.Uuid

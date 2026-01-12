@@ -4,13 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "generate:inspector": "prisma generate --schema=./prisma/inspector/schema.prisma",
-    "generate:duckkey": "prisma generate --schema=./prisma/duckkey/schema.prisma",
-    "generate:duckarchive": "prisma generate --schema=./prisma/duckarchive/schema.prisma",
+    "generate:inspector": "prisma generate --config prisma-inspector.config.ts",
+    "generate:duckkey": "prisma generate --config prisma-duckkey.config.ts",
+    "generate:duckarchive": "prisma generate --config prisma-duckarchive.config.ts",
     "generate": "npm run generate:inspector && npm run generate:duckkey && npm run generate:duckarchive",
-    "new:inspector": "prisma migrate dev --schema=./prisma/inspector/schema.prisma",
-    "new:duckkey": "prisma migrate dev --schema=./prisma/duckkey/schema.prisma",
-    "new:duckarchive": "prisma migrate dev --schema=./prisma/duckarchive/schema.prisma"
+    "new:inspector": "prisma migrate dev --config prisma-inspector.config.ts",
+    "new:duckkey": "prisma migrate dev --config prisma-duckkey.config.ts",
+    "new:duckarchive": "prisma migrate dev --config prisma-duckarchive.config.ts"
   },
   "author": {
     "name": "Alexandr Tovmach",
@@ -18,12 +18,14 @@
   },
   "license": "UNLICENSED",
   "devDependencies": {
-    "@prisma/client": "^5.18.0",
-    "prisma": "^5.18.0",
-    "prisma-zod-generator": "^0.8.13"
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "prisma": "^7.2.0",
+    "prisma-zod-generator": "^2.1.2"
   },
   "peerDependencies": {
-    "@prisma/client": ">=5",
-    "prisma-zod-generator": "^0.8.13"
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "prisma-zod-generator": "^2.1.2"
   }
 }
