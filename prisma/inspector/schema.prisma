@@ -21,6 +21,14 @@ enum ResourceType {
   GOOGLE_DRIVE
 }
 
+enum TaskStatus {
+  IDLE
+  QUEUED
+  PROCESSING
+  FAILED
+  COMPLETED
+}
+
 model Archive {
   id                     String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   code                   String                @db.VarChar(10)
@@ -39,6 +47,7 @@ model Archive {
   fetches                Fetch[]
   family_search_projects FamilySearchProject[]
   daily_stats            DailyStat[]
+  syncTasks              SyncTask[]
 
   @@index([code])
   @@map("archives")
@@ -58,6 +67,7 @@ model Fund {
   matches        Match[]
   fetches        Fetch[]
   years          FundYear[]
+  syncTasks      SyncTask[]
 
   @@unique([code, archive_id])
   @@index([code])
@@ -90,6 +100,7 @@ model Description {
   fetches        Fetch[]
   years          DescriptionYear[]
   online_copies  DescriptionOnlineCopy[]
+  syncTasks      SyncTask[]
 
   @@unique([code, fund_id])
   @@index([code])
@@ -220,6 +231,7 @@ model Resource {
   fetches                   Fetch[]
   description_online_copies DescriptionOnlineCopy[]
   case_online_copies        CaseOnlineCopy[]
+  syncTasks                 SyncTask[]
 
   @@map("resources")
 }
@@ -326,4 +338,27 @@ model DailyStat {
 
   @@id([archive_id, created_at])
   @@map("daily_stats")
+}
+
+model SyncTask {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  resource_id    String       @db.Uuid
+  resource       Resource     @relation(fields: [resource_id], references: [id])
+  archive_id     String?      @db.Uuid
+  archive        Archive?     @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fund_id        String?      @db.Uuid
+  fund           Fund?        @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  description_id String?      @db.Uuid
+  description    Description? @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status         TaskStatus   @default(IDLE)
+  priority       Int          @default(0)
+  api_url        String       @db.Text
+  api_params     Json         @db.JsonB
+  last_run_at    DateTime?    @db.Timestamp(6)
+  next_run_at    DateTime?    @db.Timestamp(6)
+  retry_count    Int          @default(0)
+  error_log      String?      @db.Text
+
+  @@unique([resource_id, archive_id, fund_id, description_id, api_params])
+  @@map("sync_tasks")
 }
