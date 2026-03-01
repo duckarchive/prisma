@@ -74,6 +74,7 @@ model Fund {
 
   @@unique([code, archive_id])
   @@index([code])
+  @@index([archive_id])
   @@map("funds")
 }
 
@@ -106,6 +107,7 @@ model Description {
 
   @@unique([code, fund_id])
   @@index([code])
+  @@index([fund_id])
   @@map("descriptions")
 }
 
@@ -152,8 +154,12 @@ model Case {
 
   @@unique([code, description_id])
   @@index([code])
+  @@index([description_id])
   @@index([full_code])
   @@index([full_code(ops: raw("gin_trgm_ops"))], type: Gin, name: "full_code_gin_trgm_ops_idx")
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([info(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([tags], type: Gin)
   @@map("cases")
 }
 
@@ -190,6 +196,7 @@ model CaseOnlineCopy {
   availability Availability?
 
   @@id([resource_id, case_id, url])
+  @@index([case_id])
   @@map("case_online_copies")
 }
 
@@ -203,6 +210,7 @@ model Author {
   cases CaseAuthor[]
 
   @@unique([title, lat, lng])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
   @@map("authors")
 }
 
@@ -214,6 +222,7 @@ model CaseAuthor {
   author Author @relation(fields: [author_id], references: [id])
 
   @@id([case_id, author_id])
+  @@index([author_id])
   @@map("case_authors")
 }
 
