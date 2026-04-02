@@ -46,7 +46,6 @@ model Archive {
   phone_number           String?               @db.VarChar(20)
   email                  String?               @db.VarChar(255)
   logo_url               String?               @db.VarChar(255)
-  children_count         Int?                  @default(0)
   funds                  Fund[]
   fetches                Fetch[]
   family_search_projects FamilySearchProject[]
@@ -64,7 +63,6 @@ model Fund {
   updated_at     DateTime?     @updatedAt @db.Timestamp(6)
   title          String?       @db.Text
   info           String?       @db.Text
-  children_count Int?          @default(0)
   archive_id     String        @db.Uuid
   archive        Archive       @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   descriptions   Description[]
@@ -96,7 +94,6 @@ model Description {
   updated_at     DateTime?               @updatedAt @db.Timestamp(6)
   title          String?                 @db.Text
   info           String?                 @db.Text
-  children_count Int?                    @default(0)
   fund_id        String                  @db.Uuid
   fund           Fund                    @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   cases          Case[]
