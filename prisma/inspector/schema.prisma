@@ -57,18 +57,18 @@ model Archive {
 }
 
 model Fund {
-  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code           String        @db.VarChar(20)
-  created_at     DateTime      @default(now()) @db.Timestamp(6)
-  updated_at     DateTime?     @updatedAt @db.Timestamp(6)
-  title          String?       @db.Text
-  info           String?       @db.Text
-  archive_id     String        @db.Uuid
-  archive        Archive       @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  descriptions   Description[]
-  fetches        Fetch[]
-  years          FundYear[]
-  syncTasks      SyncTask[]
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code         String        @db.VarChar(20)
+  created_at   DateTime      @default(now()) @db.Timestamp(6)
+  updated_at   DateTime?     @updatedAt @db.Timestamp(6)
+  title        String?       @db.Text
+  info         String?       @db.Text
+  archive_id   String        @db.Uuid
+  archive      Archive       @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  descriptions Description[]
+  fetches      Fetch[]
+  years        FundYear[]
+  syncTasks    SyncTask[]
 
   @@unique([code, archive_id])
   @@index([code])
@@ -88,19 +88,19 @@ model FundYear {
 }
 
 model Description {
-  id             String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code           String                  @db.VarChar(20)
-  created_at     DateTime                @default(now()) @db.Timestamp(6)
-  updated_at     DateTime?               @updatedAt @db.Timestamp(6)
-  title          String?                 @db.Text
-  info           String?                 @db.Text
-  fund_id        String                  @db.Uuid
-  fund           Fund                    @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  cases          Case[]
-  fetches        Fetch[]
-  years          DescriptionYear[]
-  online_copies  DescriptionOnlineCopy[]
-  syncTasks      SyncTask[]
+  id            String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code          String                  @db.VarChar(20)
+  created_at    DateTime                @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?               @updatedAt @db.Timestamp(6)
+  title         String?                 @db.Text
+  info          String?                 @db.Text
+  fund_id       String                  @db.Uuid
+  fund          Fund                    @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cases         Case[]
+  fetches       Fetch[]
+  years         DescriptionYear[]
+  online_copies DescriptionOnlineCopy[]
+  syncTasks     SyncTask[]
 
   @@unique([code, fund_id])
   @@index([code])
@@ -120,13 +120,14 @@ model DescriptionYear {
 }
 
 model DescriptionOnlineCopy {
-  updated_at     DateTime      @default(now()) @updatedAt @db.Timestamp(6)
-  resource_id    String        @db.Uuid
-  resource       Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  description_id String        @db.Uuid
-  description    Description   @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  url            String        @db.Text
-  availability   Availability?
+  updated_at              DateTime      @default(now()) @updatedAt @db.Timestamp(6)
+  checked_availability_at DateTime?     @db.Timestamp(6)
+  resource_id             String        @db.Uuid
+  resource                Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  description_id          String        @db.Uuid
+  description             Description   @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  url                     String        @db.Text
+  availability            Availability?
 
   @@id([resource_id, description_id, url])
   @@map("description_online_copies")
@@ -184,13 +185,14 @@ model CaseLocation {
 }
 
 model CaseOnlineCopy {
-  updated_at   DateTime      @default(now()) @updatedAt @db.Timestamp(6)
-  resource_id  String        @db.Uuid
-  resource     Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  case_id      String        @db.Uuid
-  case         Case          @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  url          String        @db.Text
-  availability Availability?
+  updated_at              DateTime      @default(now()) @updatedAt @db.Timestamp(6)
+  checked_availability_at DateTime?     @db.Timestamp(6)
+  resource_id             String        @db.Uuid
+  resource                Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  case_id                 String        @db.Uuid
+  case                    Case          @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  url                     String        @db.Text
+  availability            Availability?
 
   @@id([resource_id, case_id, url])
   @@index([case_id])
