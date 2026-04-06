@@ -37,7 +37,6 @@ enum Availability {
 model Archive {
   id                     String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   code                   String                @db.VarChar(10)
-  created_at             DateTime              @default(now()) @db.Timestamp(6)
   updated_at             DateTime?             @updatedAt @db.Timestamp(6)
   title                  String?               @db.Text
   info                   String?               @db.Text
@@ -47,10 +46,10 @@ model Archive {
   email                  String?               @db.VarChar(255)
   logo_url               String?               @db.VarChar(255)
   funds                  Fund[]
-  fetches                Fetch[]
   family_search_projects FamilySearchProject[]
   daily_stats            DailyStat[]
-  syncTasks              SyncTask[]
+  sync_tasks             SyncTask[]
+  fonds                  Fond[]
 
   @@index([code])
   @@map("archives")
@@ -59,16 +58,14 @@ model Archive {
 model Fund {
   id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   code         String        @db.VarChar(20)
-  created_at   DateTime      @default(now()) @db.Timestamp(6)
   updated_at   DateTime?     @updatedAt @db.Timestamp(6)
   title        String?       @db.Text
   info         String?       @db.Text
   archive_id   String        @db.Uuid
   archive      Archive       @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   descriptions Description[]
-  fetches      Fetch[]
   years        FundYear[]
-  syncTasks    SyncTask[]
+  sync_tasks   SyncTask[]
 
   @@unique([code, archive_id])
   @@index([code])
@@ -90,17 +87,15 @@ model FundYear {
 model Description {
   id            String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   code          String                  @db.VarChar(20)
-  created_at    DateTime                @default(now()) @db.Timestamp(6)
   updated_at    DateTime?               @updatedAt @db.Timestamp(6)
   title         String?                 @db.Text
   info          String?                 @db.Text
   fund_id       String                  @db.Uuid
   fund          Fund                    @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   cases         Case[]
-  fetches       Fetch[]
   years         DescriptionYear[]
   online_copies DescriptionOnlineCopy[]
-  syncTasks     SyncTask[]
+  sync_tasks    SyncTask[]
 
   @@unique([code, fund_id])
   @@index([code])
@@ -137,14 +132,12 @@ model Case {
   id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   code           String           @db.VarChar(20)
   full_code      String           @default("")
-  created_at     DateTime         @default(now()) @db.Timestamp(6)
   updated_at     DateTime?        @updatedAt @db.Timestamp(6)
   title          String?          @db.Text
   info           String?          @db.Text
   tags           String[]
   description_id String           @db.Uuid
   description    Description      @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  fetches        Fetch[]
   locations      CaseLocation[]
   years          CaseYear[]
   authors        CaseAuthor[]
@@ -200,13 +193,14 @@ model CaseOnlineCopy {
 }
 
 model Author {
-  id    String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title String
-  info  String?
-  lat   Float?
-  lng   Float?
-  tags  String[]
-  cases CaseAuthor[]
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String
+  info         String?
+  lat          Float?
+  lng          Float?
+  tags         String[]
+  cases        CaseAuthor[]
+  file_authors FileAuthor[]
 
   @@unique([title, lat, lng])
   @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
@@ -227,7 +221,6 @@ model CaseAuthor {
 
 model Resource {
   id                        String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at                DateTime                @default(now()) @db.Timestamp(6)
   updated_at                DateTime?               @updatedAt @db.Timestamp(6)
   code                      String                  @db.VarChar(50)
   title                     String?                 @db.Text
@@ -235,40 +228,17 @@ model Resource {
   url                       String?                 @db.VarChar(255)
   logo_url                  String?                 @db.VarChar(255)
   type                      ResourceType?
-  fetches                   Fetch[]
   description_online_copies DescriptionOnlineCopy[]
   case_online_copies        CaseOnlineCopy[]
-  syncTasks                 SyncTask[]
+  sync_tasks                SyncTask[]
+  inventory_online_copies   InventoryOnlineCopy[]
+  file_online_copies        FileOnlineCopy[]
 
   @@map("resources")
 }
 
-model Fetch {
-  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at          DateTime     @default(now()) @db.Timestamp(6)
-  updated_at          DateTime?    @updatedAt @db.Timestamp(6)
-  resource_id         String       @db.Uuid
-  resource            Resource     @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  api_url             String       @db.VarChar(255)
-  api_params          Json         @db.JsonB
-  archive_id          String?      @db.Uuid
-  archive             Archive?     @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  fund_id             String?      @db.Uuid
-  fund                Fund?        @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  description_id      String?      @db.Uuid
-  description         Description? @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  case_id             String?      @db.Uuid
-  case                Case?        @relation(fields: [case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  children_count      Int?
-  prev_children_count Int?
-
-  @@unique([resource_id, archive_id, fund_id, description_id, case_id, api_params])
-  @@map("fetches")
-}
-
 model FamilySearchPlace {
   id          Int       @id @db.Integer
-  created_at  DateTime  @default(now()) @db.Timestamp(6)
   updated_at  DateTime? @updatedAt @db.Timestamp(6)
   title       String?   @db.VarChar(255)
   total_count Int?
@@ -338,7 +308,162 @@ model SyncTask {
   next_run_at    DateTime?    @db.Timestamp(6)
   retry_count    Int          @default(0)
   error_log      String?      @db.Text
+  fond           Fond?        @relation(fields: [fond_id], references: [id])
+  fond_id        String?      @db.Uuid
+  inventory      Inventory?   @relation(fields: [inventory_id], references: [id])
+  inventory_id   String?      @db.Uuid
 
   @@unique([resource_id, archive_id, fund_id, description_id, api_params])
   @@map("sync_tasks")
+}
+
+// catalog structure
+
+model Fond {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String      @db.VarChar(20)
+  updated_at  DateTime?   @updatedAt @db.Timestamp(6)
+  title       String?     @db.Text
+  info        String?     @db.Text
+  archive_id  String      @db.Uuid
+  archive     Archive     @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  years       FondYear[]
+  sync_tasks  SyncTask[]
+  inventories Inventory[]
+
+  @@unique([code, archive_id])
+  @@index([code])
+  @@index([archive_id])
+  @@map("fonds")
+}
+
+model FondYear {
+  fond_id    String @db.Uuid
+  fond       Fond   @relation(fields: [fond_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  start_year Int
+  end_year   Int
+
+  @@id([fond_id, start_year, end_year])
+  @@index([start_year, end_year])
+  @@map("fond_years")
+}
+
+model Inventory {
+  id            String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code          String                @db.VarChar(20)
+  updated_at    DateTime?             @updatedAt @db.Timestamp(6)
+  title         String?               @db.Text
+  info          String?               @db.Text
+  fond_id       String                @db.Uuid
+  fond          Fond                  @relation(fields: [fond_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  years         InventoryYear[]
+  online_copies InventoryOnlineCopy[]
+  sync_tasks    SyncTask[]
+  files         File[]
+
+  @@unique([code, fond_id])
+  @@index([code])
+  @@index([fond_id])
+  @@map("inventories")
+}
+
+model InventoryYear {
+  inventory_id String    @db.Uuid
+  inventory    Inventory @relation(fields: [inventory_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  start_year   Int
+  end_year     Int
+
+  @@id([inventory_id, start_year, end_year])
+  @@index([start_year, end_year])
+  @@map("inventory_years")
+}
+
+model InventoryOnlineCopy {
+  updated_at              DateTime      @default(now()) @updatedAt @db.Timestamp(6)
+  checked_availability_at DateTime?     @db.Timestamp(6)
+  resource_id             String        @db.Uuid
+  resource                Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  inventory_id            String        @db.Uuid
+  inventory               Inventory     @relation(fields: [inventory_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  url                     String        @db.Text
+  availability            Availability?
+
+  @@id([resource_id, inventory_id, url])
+  @@map("inventory_online_copies")
+}
+
+model File {
+  id            String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code          String           @db.VarChar(20)
+  full_code     String           @default("")
+  updated_at    DateTime?        @updatedAt @db.Timestamp(6)
+  title         String?          @db.Text
+  info          String?          @db.Text
+  tags          String[]
+  inventory_id  String           @db.Uuid
+  inventory     Inventory        @relation(fields: [inventory_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations     FileLocation[]
+  years         FileYear[]
+  authors       FileAuthor[]
+  online_copies FileOnlineCopy[]
+
+  @@unique([code, inventory_id])
+  @@index([code])
+  @@index([inventory_id])
+  @@index([full_code])
+  @@index([full_code(ops: raw("gin_trgm_ops"))], type: Gin, name: "file_full_code_gin_trgm_ops_idx")
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([info(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([tags], type: Gin)
+  @@map("files")
+}
+
+model FileYear {
+  file_id    String @db.Uuid
+  file       File   @relation(fields: [file_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  start_year Int
+  end_year   Int
+
+  @@id([file_id, start_year, end_year])
+  @@index([start_year, end_year])
+  @@map("file_years")
+}
+
+model FileLocation {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lat      Float
+  lng      Float
+  radius_m Int    @default(0)
+  file_id  String @db.Uuid
+  file     File   @relation(fields: [file_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([file_id, lat, lng, radius_m])
+  @@map("file_locations")
+}
+
+model FileOnlineCopy {
+  updated_at              DateTime      @default(now()) @updatedAt @db.Timestamp(6)
+  checked_availability_at DateTime?     @db.Timestamp(6)
+  resource_id             String        @db.Uuid
+  resource                Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  file_id                 String        @db.Uuid
+  file                    File          @relation(fields: [file_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  url                     String        @db.Text
+  availability            Availability?
+
+  @@id([resource_id, file_id, url])
+  @@index([file_id])
+  @@map("file_online_copies")
+}
+
+model FileAuthor {
+  file_id   String @db.Uuid
+  author_id String @db.Uuid
+
+  file   File   @relation(fields: [file_id], references: [id])
+  author Author @relation(fields: [author_id], references: [id])
+
+  @@id([file_id, author_id])
+  @@index([author_id])
+  @@map("file_authors")
 }
