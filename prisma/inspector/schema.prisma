@@ -383,12 +383,13 @@ model InventoryOnlineCopy {
   checked_availability_at DateTime?     @db.Timestamp(6)
   resource_id             String        @db.Uuid
   resource                Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  inventory_id            String        @db.Uuid
-  inventory               Inventory     @relation(fields: [inventory_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  inventory_id            String?       @db.Uuid
+  inventory               Inventory?    @relation(fields: [inventory_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   url                     String        @db.Text
   availability            Availability?
+  full_code               String        @default("")
 
-  @@id([resource_id, inventory_id, url])
+  @@id([resource_id, full_code, url])
   @@map("inventory_online_copies")
 }
 
@@ -446,12 +447,13 @@ model FileOnlineCopy {
   checked_availability_at DateTime?     @db.Timestamp(6)
   resource_id             String        @db.Uuid
   resource                Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  file_id                 String        @db.Uuid
-  file                    File          @relation(fields: [file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  file_id                 String?       @db.Uuid
+  file                    File?         @relation(fields: [file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   url                     String        @db.Text
   availability            Availability?
+  full_code               String        @default("")
 
-  @@id([resource_id, file_id, url])
+  @@id([resource_id, full_code, url])
   @@index([file_id])
   @@map("file_online_copies")
 }
