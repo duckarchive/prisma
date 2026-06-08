@@ -379,6 +379,7 @@ model InventoryYear {
 }
 
 model InventoryOnlineCopy {
+  id                      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   updated_at              DateTime      @default(now()) @updatedAt @db.Timestamp(6)
   checked_availability_at DateTime?     @db.Timestamp(6)
   resource_id             String        @db.Uuid
@@ -387,9 +388,9 @@ model InventoryOnlineCopy {
   inventory               Inventory?    @relation(fields: [inventory_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   url                     String        @db.Text
   availability            Availability?
-  full_code               String        @default("")
+  parsed                  String        @default("")
 
-  @@id([resource_id, full_code, url])
+  @@unique([resource_id, inventory_id, parsed, url])
   @@map("inventory_online_copies")
 }
 
@@ -443,6 +444,7 @@ model FileLocation {
 }
 
 model FileOnlineCopy {
+  id                      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   updated_at              DateTime      @default(now()) @updatedAt @db.Timestamp(6)
   checked_availability_at DateTime?     @db.Timestamp(6)
   resource_id             String        @db.Uuid
@@ -451,9 +453,9 @@ model FileOnlineCopy {
   file                    File?         @relation(fields: [file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   url                     String        @db.Text
   availability            Availability?
-  full_code               String        @default("")
+  parsed                  String        @default("")
 
-  @@id([resource_id, full_code, url])
+  @@unique([resource_id, file_id, parsed, url])
   @@index([file_id])
   @@map("file_online_copies")
 }
