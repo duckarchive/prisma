@@ -402,6 +402,8 @@ model InventoryOnlineCopy {
   actions                 InventoryActions[]
 
   @@unique([resource_id, inventory_id, parsed, url])
+  @@index([parsed])
+  @@index([parsed(ops: raw("gin_trgm_ops"))], type: Gin, name: "inventory_online_copy_parsed_gin_trgm_ops_idx")
   @@map("inventory_online_copies")
 }
 
@@ -493,6 +495,8 @@ model FileOnlineCopy {
   actions             FileActions[]
 
   @@unique([resource_id, file_id, parsed, url])
+  @@index([parsed])
+  @@index([parsed(ops: raw("gin_trgm_ops"))], type: Gin, name: "file_online_copy_parsed_gin_trgm_ops_idx")
   @@index([file_id])
   @@map("file_online_copies")
 }
