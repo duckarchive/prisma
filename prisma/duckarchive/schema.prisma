@@ -18,7 +18,7 @@ model User {
   created_at             DateTime                @default(now()) @db.Timestamp(6)
   email                  String                  @id @db.VarChar(255)
   is_banned              Boolean                 @default(false)
-  is_premium             Boolean                 @default(false)
+  is_editor              Boolean                 @default(false)
   is_admin               Boolean                 @default(false)
   points                 Int                     @default(0)
   user_downloads         UserDownload[]
