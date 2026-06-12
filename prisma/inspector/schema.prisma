@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
+  provider        = "prisma-client"
+  output          = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
+  previewFeatures = ["partialIndexes"]
 }
 
 generator zod {
@@ -32,6 +33,14 @@ enum TaskStatus {
 enum Availability {
   PUBLIC
   RESTRICTED
+}
+
+enum ActionType {
+  report
+  connect_to_online_copy
+  disconnect_from_online_copy
+  add_online_copy
+  remove_online_copy
 }
 
 model Archive {
@@ -360,6 +369,7 @@ model Inventory {
   online_copies InventoryOnlineCopy[]
   sync_tasks    SyncTask[]
   files         File[]
+  actions       InventoryActions[]
 
   @@unique([code, fond_id])
   @@index([code])
@@ -379,19 +389,44 @@ model InventoryYear {
 }
 
 model InventoryOnlineCopy {
-  id                      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  updated_at              DateTime      @default(now()) @updatedAt @db.Timestamp(6)
-  checked_availability_at DateTime?     @db.Timestamp(6)
-  resource_id             String        @db.Uuid
-  resource                Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  inventory_id            String?       @db.Uuid
-  inventory               Inventory?    @relation(fields: [inventory_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  url                     String        @db.Text
+  id                      String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  updated_at              DateTime           @default(now()) @updatedAt @db.Timestamp(6)
+  checked_availability_at DateTime?          @db.Timestamp(6)
+  resource_id             String             @db.Uuid
+  resource                Resource           @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  inventory_id            String?            @db.Uuid
+  inventory               Inventory?         @relation(fields: [inventory_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  url                     String             @db.Text
   availability            Availability?
-  parsed                  String        @default("")
+  parsed                  String             @default("")
+  actions                 InventoryActions[]
 
   @@unique([resource_id, inventory_id, parsed, url])
   @@map("inventory_online_copies")
+}
+
+model InventoryActions {
+  id             String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at     DateTime             @default(now()) @db.Timestamp(6)
+  created_by     String               @db.VarChar(255)
+  resolved_at    DateTime?            @db.Timestamp(6)
+  resolved_by    String?              @db.VarChar(255)
+  type           ActionType
+  note           String?              @db.Text
+  is_rejected    Boolean?
+  online_copy_id String?              @db.Uuid
+  online_copy    InventoryOnlineCopy? @relation(fields: [online_copy_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  inventory_id   String?              @db.Uuid
+  inventory      Inventory?           @relation(fields: [inventory_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  // at most one pending action per (type, target); three indexes emulate
+  // NULLS NOT DISTINCT, which partial indexes can't express
+  @@unique([type, online_copy_id, inventory_id], where: raw("resolved_at IS NULL"))
+  @@unique([type, inventory_id], where: raw("resolved_at IS NULL AND online_copy_id IS NULL"))
+  @@unique([type, online_copy_id], where: raw("resolved_at IS NULL AND inventory_id IS NULL"))
+  @@index([inventory_id])
+  @@index([online_copy_id])
+  @@map("inventory_actions")
 }
 
 model File {
@@ -408,6 +443,7 @@ model File {
   years         FileYear[]
   authors       FileAuthor[]
   online_copies FileOnlineCopy[]
+  actions   FileActions[]
 
   @@unique([code, inventory_id])
   @@index([code])
@@ -454,6 +490,7 @@ model FileOnlineCopy {
   url                     String        @db.Text
   availability            Availability?
   parsed                  String        @default("")
+  actions             FileActions[]
 
   @@unique([resource_id, file_id, parsed, url])
   @@index([file_id])
@@ -470,4 +507,28 @@ model FileAuthor {
   @@id([file_id, author_id])
   @@index([author_id])
   @@map("file_authors")
+}
+
+model FileActions {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at     DateTime        @default(now()) @db.Timestamp(6)
+  created_by     String          @db.VarChar(255)
+  resolved_at    DateTime?       @db.Timestamp(6)
+  resolved_by    String?         @db.VarChar(255)
+  type           ActionType
+  note           String?         @db.Text
+  is_rejected    Boolean?
+  online_copy_id String?         @db.Uuid
+  online_copy    FileOnlineCopy? @relation(fields: [online_copy_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  file_id        String?         @db.Uuid
+  file           File?           @relation(fields: [file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  // at most one pending action per (type, target); three indexes emulate
+  // NULLS NOT DISTINCT, which partial indexes can't express
+  @@unique([type, online_copy_id, file_id], where: raw("resolved_at IS NULL"))
+  @@unique([type, file_id], where: raw("resolved_at IS NULL AND online_copy_id IS NULL"))
+  @@unique([type, online_copy_id], where: raw("resolved_at IS NULL AND file_id IS NULL"))
+  @@index([file_id])
+  @@index([online_copy_id])
+  @@map("file_actions")
 }
