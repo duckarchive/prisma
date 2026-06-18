@@ -41,6 +41,20 @@ enum ActionType {
   disconnect_from_online_copy
   add_online_copy
   remove_online_copy
+  add
+  remove
+  change_parent
+  change_title
+  change_code
+  change_info
+  add_year_range
+  remove_year_range
+  connect_to_author
+  disconnect_from_author
+  add_author
+  remove_author
+  add_location
+  remove_location
 }
 
 model Archive {
@@ -339,6 +353,7 @@ model Fond {
   years       FondYear[]
   sync_tasks  SyncTask[]
   inventories Inventory[]
+  actions     FondActions[]
 
   @@unique([code, archive_id])
   @@index([code])
@@ -355,6 +370,24 @@ model FondYear {
   @@id([fond_id, start_year, end_year])
   @@index([start_year, end_year])
   @@map("fond_years")
+}
+
+model FondActions {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at     DateTime        @default(now()) @db.Timestamp(6)
+  created_by     String          @db.VarChar(255)
+  resolved_at    DateTime?       @db.Timestamp(6)
+  resolved_by    String?         @db.VarChar(255)
+  type           ActionType
+  note           String?         @db.Text
+  is_rejected    Boolean?
+  fond_id        String?         @db.Uuid
+  fond           Fond?           @relation(fields: [fond_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  // at most one pending action per (type, fond) while unresolved
+  @@unique([type, fond_id], where: raw("resolved_at IS NULL"))
+  @@index([fond_id])
+  @@map("fond_actions")
 }
 
 model Inventory {
