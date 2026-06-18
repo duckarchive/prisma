@@ -53,6 +53,10 @@ enum ActionType {
   disconnect_from_author
   add_author
   remove_author
+  change_author_title
+  change_author_info
+  change_author_tags
+  change_author_location
   add_location
   remove_location
 }
