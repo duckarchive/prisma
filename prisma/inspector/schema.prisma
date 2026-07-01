@@ -43,6 +43,7 @@ enum ActionType {
   remove_online_copy
   add
   remove
+  merge_to
   change_parent
   change_title
   change_code
