@@ -7,10 +7,12 @@
     "generate:inspector": "prisma generate --config prisma-inspector.config.ts",
     "generate:duckkey": "prisma generate --config prisma-duckkey.config.ts",
     "generate:duckarchive": "prisma generate --config prisma-duckarchive.config.ts",
-    "generate": "npm run generate:inspector && npm run generate:duckkey && npm run generate:duckarchive",
+    "generate:nest": "prisma generate --config prisma-nest.config.ts",
+    "generate": "npm run generate:inspector && npm run generate:duckkey && npm run generate:duckarchive && npm run generate:nest",
     "new:inspector": "prisma migrate dev --config prisma-inspector.config.ts",
     "new:duckkey": "prisma migrate dev --config prisma-duckkey.config.ts",
-    "new:duckarchive": "prisma migrate dev --config prisma-duckarchive.config.ts"
+    "new:duckarchive": "prisma migrate dev --config prisma-duckarchive.config.ts",
+    "new:nest": "prisma migrate dev --config prisma-nest.config.ts"
   },
   "author": {
     "name": "Alexandr Tovmach",

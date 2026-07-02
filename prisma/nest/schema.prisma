@@ -1,0 +1,105 @@
+// Prisma schema for nest database (Facebook Group Archiver)
+// All ids are Facebook's own string ids so upserts are idempotent.
+// created_at / timestamps are unix SECONDS (BIGINT) to match FB payloads.
+generator client {
+  provider        = "prisma-client"
+  output          = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Author {
+  id         String   @id @db.VarChar(255)
+  name       String?  @db.Text
+  profileUrl String?  @db.Text @map("profile_url")
+  updatedAt  BigInt?  @map("updated_at")
+
+  @@map("authors")
+}
+
+model Post {
+  id            String    @id @db.VarChar(255)
+  groupId       String?   @db.VarChar(255) @map("group_id")
+  authorId      String?   @db.VarChar(255) @map("author_id")
+  authorName    String?   @db.Text @map("author_name")
+  permalink     String?   @db.Text
+  createdAt     BigInt?   @map("created_at")
+  text          String?   @db.Text
+  reactionsJson String?   @db.Text @map("reactions_json")
+  commentCount  Int?      @map("comment_count")
+  shareCount    Int?      @map("share_count")
+  state         String?   @default("discovered") @db.VarChar(255) // discovered|complete
+  feedCursor    String?   @db.Text @map("feed_cursor")
+  rawJson       String?   @db.Text @map("raw_json")
+  scrapedAt     BigInt?   @map("scraped_at")
+  updatedAt     BigInt?   @map("updated_at")
+
+  comments Comment[]
+  media    Media[]
+
+  @@index([state])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+model Comment {
+  id              String   @id @db.VarChar(255)
+  postId          String   @db.VarChar(255) @map("post_id")
+  post            Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentCommentId String?  @db.VarChar(255) @map("parent_comment_id")
+  authorId        String?  @db.VarChar(255) @map("author_id")
+  authorName      String?  @db.Text @map("author_name")
+  text            String?  @db.Text
+  createdAt       BigInt?  @map("created_at")
+  reactionsJson   String?  @db.Text @map("reactions_json")
+  depth           Int?     @default(0)
+  replyCursor     String?  @db.Text @map("reply_cursor")
+  repliesComplete Int?     @default(0) @map("replies_complete")
+  rawJson         String?  @db.Text @map("raw_json")
+  scrapedAt       BigInt?  @map("scraped_at")
+
+  @@index([postId])
+  @@index([parentCommentId])
+  @@map("comments")
+}
+
+model Media {
+  id        String  @id @db.VarChar(255) // FB media id when known, else sha256
+  postId    String? @db.VarChar(255) @map("post_id")
+  post      Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId String? @db.VarChar(255) @map("comment_id")
+  type      String? @default("image") @db.VarChar(255)
+  sourceUrl String? @db.Text @map("source_url")
+  localPath String? @db.Text @map("local_path")
+  sha256    String? @db.VarChar(255)
+  width     BigInt?
+  height    BigInt?
+  bytes     BigInt?
+  status    String? @default("pending") @db.VarChar(255) // pending|downloaded|error|skipped
+  error     String? @db.Text
+  scrapedAt BigInt? @map("scraped_at")
+
+  @@index([status])
+  @@index([sha256])
+  @@map("media")
+}
+
+model ScrapeState {
+  key   String @id @db.VarChar(255)
+  value String? @db.Text
+
+  @@map("scrape_state")
+}
+
+model ScrapeLog {
+  id          BigInt  @id @default(autoincrement())
+  ts          BigInt?
+  level       String? @db.VarChar(255)
+  message     String? @db.Text
+  contextJson String? @db.Text @map("context_json")
+
+  @@map("scrape_log")
+}
