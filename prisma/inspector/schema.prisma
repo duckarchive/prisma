@@ -450,6 +450,7 @@ model OnlineCopy {
   @@index([parsed(ops: raw("gin_trgm_ops"))], type: Gin, name: "online_copy_parsed_gin_trgm_ops_idx")
   @@index([inventory_id])
   @@index([file_id])
+  @@index([url], name: "online_copies_url_prefix_idx")
   @@map("online_copies")
 }
 
