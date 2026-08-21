@@ -73,7 +73,6 @@ model Archive {
   phone_number           String?               @db.VarChar(20)
   email                  String?               @db.VarChar(255)
   logo_url               String?               @db.VarChar(255)
-  funds                  Fund[]
   family_search_projects FamilySearchProject[]
   daily_stats            DailyStat[]
   sync_tasks             SyncTask[]
@@ -83,143 +82,8 @@ model Archive {
   @@map("archives")
 }
 
-model Fund {
-  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code         String        @db.VarChar(20)
-  updated_at   DateTime?     @updatedAt @db.Timestamp(6)
-  title        String?       @db.Text
-  info         String?       @db.Text
-  archive_id   String        @db.Uuid
-  archive      Archive       @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  descriptions Description[]
-  years        FundYear[]
-  sync_tasks   SyncTask[]
-
-  @@unique([code, archive_id])
-  @@index([code])
-  @@index([archive_id])
-  @@map("funds")
-}
-
-model FundYear {
-  fund_id    String @db.Uuid
-  fund       Fund   @relation(fields: [fund_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  start_year Int
-  end_year   Int
-
-  @@id([fund_id, start_year, end_year])
-  @@index([start_year, end_year])
-  @@map("fund_years")
-}
-
-model Description {
-  id            String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code          String                  @db.VarChar(20)
-  updated_at    DateTime?               @updatedAt @db.Timestamp(6)
-  title         String?                 @db.Text
-  info          String?                 @db.Text
-  fund_id       String                  @db.Uuid
-  fund          Fund                    @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  cases         Case[]
-  years         DescriptionYear[]
-  online_copies DescriptionOnlineCopy[]
-  sync_tasks    SyncTask[]
-
-  @@unique([code, fund_id])
-  @@index([code])
-  @@index([fund_id])
-  @@map("descriptions")
-}
-
-model DescriptionYear {
-  description_id String      @db.Uuid
-  description    Description @relation(fields: [description_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  start_year     Int
-  end_year       Int
-
-  @@id([description_id, start_year, end_year])
-  @@index([start_year, end_year])
-  @@map("description_years")
-}
-
-model DescriptionOnlineCopy {
-  updated_at              DateTime      @default(now()) @updatedAt @db.Timestamp(6)
-  checked_availability_at DateTime?     @db.Timestamp(6)
-  resource_id             String        @db.Uuid
-  resource                Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  description_id          String        @db.Uuid
-  description             Description   @relation(fields: [description_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  url                     String        @db.Text
-  availability            Availability?
-
-  @@id([resource_id, description_id, url])
-  @@map("description_online_copies")
-}
-
-model Case {
-  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code           String           @db.VarChar(20)
-  full_code      String           @default("")
-  updated_at     DateTime?        @updatedAt @db.Timestamp(6)
-  title          String?          @db.Text
-  info           String?          @db.Text
-  tags           String[]
-  description_id String           @db.Uuid
-  description    Description      @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  locations      CaseLocation[]
-  years          CaseYear[]
-  authors        CaseAuthor[]
-  online_copies  CaseOnlineCopy[]
-
-  @@unique([code, description_id])
-  @@index([code])
-  @@index([description_id])
-  @@index([full_code])
-  @@index([full_code(ops: raw("gin_trgm_ops"))], type: Gin, name: "full_code_gin_trgm_ops_idx")
-  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
-  @@index([info(ops: raw("gin_trgm_ops"))], type: Gin)
-  @@index([tags], type: Gin)
-  @@map("cases")
-}
-
-model CaseYear {
-  case_id    String @db.Uuid
-  case       Case   @relation(fields: [case_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  start_year Int
-  end_year   Int
-
-  @@id([case_id, start_year, end_year])
-  @@index([start_year, end_year])
-  @@map("case_years")
-}
-
-model CaseLocation {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  lat      Float
-  lng      Float
-  radius_m Int    @default(0)
-  case_id  String @db.Uuid
-  case     Case   @relation(fields: [case_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@unique([case_id, lat, lng, radius_m])
-  @@map("case_locations")
-}
-
-model CaseOnlineCopy {
-  updated_at              DateTime      @default(now()) @updatedAt @db.Timestamp(6)
-  checked_availability_at DateTime?     @db.Timestamp(6)
-  resource_id             String        @db.Uuid
-  resource                Resource      @relation(fields: [resource_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  case_id                 String        @db.Uuid
-  case                    Case          @relation(fields: [case_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  url                     String        @db.Text
-  availability            Availability?
-
-  @@id([resource_id, case_id, url])
-  @@index([case_id])
-  @@map("case_online_copies")
-}
-
+// authors_geog_idx: same geography GiST expression index as file_locations,
+// partial on lat/lng NOT NULL — raw migration, not expressible here.
 model Author {
   id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title        String
@@ -227,24 +91,11 @@ model Author {
   lat          Float?
   lng          Float?
   tags         String[]
-  cases        CaseAuthor[]
   file_authors FileAuthor[]
 
   @@unique([title, lat, lng])
   @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
   @@map("authors")
-}
-
-model CaseAuthor {
-  case_id   String @db.Uuid
-  author_id String @db.Uuid
-
-  case   Case   @relation(fields: [case_id], references: [id])
-  author Author @relation(fields: [author_id], references: [id])
-
-  @@id([case_id, author_id])
-  @@index([author_id])
-  @@map("case_authors")
 }
 
 model Resource {
@@ -256,8 +107,6 @@ model Resource {
   url                       String?                 @db.VarChar(255)
   logo_url                  String?                 @db.VarChar(255)
   type                      ResourceType?
-  description_online_copies DescriptionOnlineCopy[]
-  case_online_copies        CaseOnlineCopy[]
   sync_tasks                SyncTask[]
   online_copies             OnlineCopy[]
 
@@ -323,10 +172,6 @@ model SyncTask {
   resource       Resource     @relation(fields: [resource_id], references: [id])
   archive_id     String?      @db.Uuid
   archive        Archive?     @relation(fields: [archive_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  fund_id        String?      @db.Uuid
-  fund           Fund?        @relation(fields: [fund_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  description_id String?      @db.Uuid
-  description    Description? @relation(fields: [description_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   status         TaskStatus   @default(IDLE)
   priority       Int          @default(0)
   api_url        String       @db.Text
@@ -340,7 +185,7 @@ model SyncTask {
   inventory      Inventory?   @relation(fields: [inventory_id], references: [id])
   inventory_id   String?      @db.Uuid
 
-  @@unique([resource_id, archive_id, fund_id, description_id, api_params])
+  @@unique([resource_id, archive_id, fond_id, inventory_id, api_params])
   @@map("sync_tasks")
 }
 
@@ -451,6 +296,8 @@ model OnlineCopy {
   @@index([inventory_id])
   @@index([file_id])
   @@index([url], name: "online_copies_url_prefix_idx")
+  // per-resource public counters (data/resources.ts in the inspector)
+  @@index([resource_id], where: raw("availability = 'PUBLIC'"), name: "online_copies_public_by_resource_idx")
   @@map("online_copies")
 }
 
@@ -516,6 +363,9 @@ model FileYear {
   @@map("file_years")
 }
 
+// Geo-radius search relies on a GiST index over the expression
+// ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography (file_locations_geog_idx),
+// created by a raw migration — Prisma can't express expression indexes.
 model FileLocation {
   id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   lat      Float
