@@ -103,3 +103,17 @@ model ScrapeLog {
 
   @@map("scrape_log")
 }
+
+model Ocr {
+  id           Int       @id @default(autoincrement())
+  url          String    @unique @db.Text
+  fullCode     String    @db.VarChar(255) @map("full_code")
+  raw          Json?
+  structured   String?   @db.Text
+  error        String?   @db.Text
+  recognizedAt DateTime? @db.Timestamp(6) @map("recognized_at")
+
+  @@index([fullCode])
+  @@index([recognizedAt])
+  @@map("ocr")
+}
