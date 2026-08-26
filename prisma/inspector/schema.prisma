@@ -20,6 +20,8 @@ enum ResourceType {
   BABYN_YAR
   WEBSITE
   GOOGLE_DRIVE
+  USHMM
+  AROLSEN
 }
 
 enum TaskStatus {
