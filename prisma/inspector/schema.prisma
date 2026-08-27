@@ -22,6 +22,7 @@ enum ResourceType {
   GOOGLE_DRIVE
   USHMM
   AROLSEN
+  LIBRARY
 }
 
 enum TaskStatus {
