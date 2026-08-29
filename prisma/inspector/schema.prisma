@@ -23,6 +23,7 @@ enum ResourceType {
   USHMM
   AROLSEN
   LIBRARY
+  LIBRARIA
 }
 
 enum TaskStatus {
@@ -36,6 +37,7 @@ enum TaskStatus {
 enum Availability {
   PUBLIC
   RESTRICTED
+  PAYWALL
 }
 
 enum ActionType {
