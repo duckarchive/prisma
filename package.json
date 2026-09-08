@@ -14,7 +14,13 @@
     "new:duckkey": "prisma migrate dev --config prisma-duckkey.config.ts",
     "new:duckarchive": "prisma migrate dev --config prisma-duckarchive.config.ts",
     "new:nest": "prisma migrate dev --config prisma-nest.config.ts",
-    "new:druk": "prisma migrate dev --config prisma-druk.config.ts"
+    "new:druk": "prisma migrate dev --config prisma-druk.config.ts",
+    "deploy:inspector": "prisma migrate deploy --config prisma-inspector.config.ts",
+    "deploy:duckkey": "prisma migrate deploy --config prisma-duckkey.config.ts",
+    "deploy:duckarchive": "prisma migrate deploy --config prisma-duckarchive.config.ts",
+    "deploy:nest": "prisma migrate deploy --config prisma-nest.config.ts",
+    "deploy:druk": "prisma migrate deploy --config prisma-druk.config.ts",
+    "deploy": "npm run deploy:inspector && npm run deploy:duckkey && npm run deploy:duckarchive && npm run deploy:nest && npm run deploy:druk"
   },
   "author": {
     "name": "Alexandr Tovmach",

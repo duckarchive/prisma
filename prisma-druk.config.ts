@@ -8,6 +8,7 @@ export default defineConfig({
   },
   datasource: {
     url: env("DRUK_DATABASE_URL"),
-    shadowDatabaseUrl: env("SHADOW_DATABASE_URL"),
+    // Only needed by `migrate dev`; `migrate deploy` runs without a shadow database.
+    ...(process.env.SHADOW_DATABASE_URL ? { shadowDatabaseUrl: env("SHADOW_DATABASE_URL") } : {}),
   },
 });
