@@ -1,0 +1,39 @@
+// Prisma schema for druk database (full-text search over OCR'd printed sources).
+// documents = one scanned unit (a file / an issue); pages = one OCR'd page each.
+// pages.search is a Postgres GENERATED tsvector maintained by the database itself
+// (see the init migration: druk_fold() + GIN index) — never write to it from code.
+
+generator client {
+  provider = "prisma-client"
+  output   = env("PRISMA_CLIENT_OUTPUT") // e.g., "generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Document {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  inspector_url   String?   @unique @db.Text
+  online_copy_url String?   @unique @db.Text
+  updated_at      DateTime? @updatedAt @db.Timestamp(6)
+  recognized_at   DateTime? @db.Timestamp(6)
+  pages           Page[]
+
+  @@index([recognized_at])
+  @@map("documents")
+}
+
+model Page {
+  id          String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id String                   @db.Uuid
+  document    Document                 @relation(fields: [document_id], references: [id], onDelete: Cascade)
+  page_idx    Int
+  markdown    String?                  @db.Text
+  raw         Json?
+  search      Unsupported("tsvector")? @default(dbgenerated("to_tsvector('simple'::regconfig, druk_fold(COALESCE(markdown, ''::text)))"))
+
+  @@unique([document_id, page_idx])
+  @@index([search], type: Gin)
+  @@map("pages")
+}
